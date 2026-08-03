@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Notebook — The Impact of Karma in the Modern World</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Noto+Serif+Devanagari:wght@400;600;700&family=Hind:wght@300;400;600;700&family=Baloo+2:wght@400;600;700&family=Yatra+One&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #201f1f;
+    --binding: #0c0c0c;
+    --binding-dark: #000;
+    --ink: #e9dfc7;
+    --accent: #c9922a;
+    --rail-bg: #100c07;
+    --rail-text: #f0e3c8;
+    --font-body: 'Hind', sans-serif;
+    --font-size: 21px;
+    --line-height: 1.9;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0; height:100%; overflow:hidden;
+    background: radial-gradient(ellipse at top, #2b2b2b 0%, #0a0a0a 70%);
+    font-family: var(--font-body);
+  }
+
+  .app{ display:flex; height:100vh; width:100vw; }
+
+  /* ============ ICON RAIL ============ */
+  .rail{
+    width: 62px; min-width:62px;
+    background: linear-gradient(180deg, var(--rail-bg), #050301);
+    display:flex; flex-direction:column; align-items:center;
+    padding: 16px 0;
+    gap: 10px;
+    z-index: 60;
+    box-shadow: inset -4px 0 14px rgba(0,0,0,.5);
+    transition: transform .3s ease;
+  }
+  .rail-logo{
+    font-family:'Yatra One', cursive;
+    color: var(--accent);
+    font-size:22px;
+    margin-bottom: 8px;
+  }
+  .icon-btn{
+    width: 42px; height:42px; border-radius: 12px;
+    background:#241c10; border:1px solid rgba(240,227,200,.12);
+    color: var(--rail-text); font-size:18px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition: background .15s, transform .15s;
+    position: relative;
+  }
+  .icon-btn:hover{ background:#3a2b16; transform: scale(1.06); }
+  .icon-btn.active{ background: var(--accent); color:#1a120b; }
+  .rail-spacer{ flex:1; }
+  .rail-foot{ font-size:9px; color:#7d6844; text-align:center; line-height:1.4; padding:0 4px; }
+
+  /* ============ FLYOUT PANEL ============ */
+  .flyout{
+    position: fixed;
+    left: 74px; top: 16px;
+    width: 230px;
+    background: linear-gradient(180deg, #17110a, #0d0906);
+    border: 1px solid rgba(240,227,200,.14);
+    border-radius: 14px;
+    padding: 16px;
+    color: var(--rail-text);
+    box-shadow: 0 20px 50px rgba(0,0,0,.55);
+    z-index: 70;
+    display:none;
+  }
+  .flyout.show{ display:block; animation: pop .15s ease; }
+  @keyframes pop{ from{ opacity:0; transform: translateY(-6px);} to{opacity:1; transform:translateY(0);} }
+  .flyout h4{
+    margin:0 0 12px 0; font-size:12px; text-transform:uppercase; letter-spacing:1.5px;
+    color:var(--accent); font-family:'Baloo 2',sans-serif;
+  }
+  .swatches{ display:flex; flex-wrap:wrap; gap:9px; }
+  .swatch{
+    width:30px; height:30px; border-radius:50%;
+    border:2px solid rgba(240,227,200,.25); cursor:pointer;
+  }
+  .swatch:hover{ transform:scale(1.1); }
+  .swatch.active{ border-color: var(--accent); box-shadow:0 0 0 3px rgba(201,146,42,.25); }
+
+  select, input[type=color]{
+    width:100%; background:#241c10; color:var(--rail-text);
+    border:1px solid rgba(240,227,200,.18); border-radius:8px; padding:8px; font-size:13px; font-family:inherit;
+  }
+  .colorwrap{ display:flex; align-items:center; gap:10px; }
+  .colorwrap input[type=color]{ width:40px; height:32px; padding:2px; cursor:pointer; }
+  .color-presets{ display:flex; gap:7px; flex-wrap:wrap; flex:1; }
+  .cdot{ width:20px; height:20px; border-radius:50%; cursor:pointer; border:2px solid rgba(240,227,200,.2); }
+  .cdot.active{ border-color: var(--accent); }
+
+  .size-control{ display:flex; align-items:center; justify-content:space-between; background:#241c10; border-radius:9px; padding:5px 8px; }
+  .size-btn{ width:30px; height:30px; border-radius:7px; border:none; background:#3a2b16; color:var(--accent); font-size:16px; font-weight:700; cursor:pointer; }
+  .size-btn:hover{ background:var(--accent); color:#1a120b; }
+  .size-val{ font-size:13px; }
+
+  .jump-row{ display:flex; gap:6px; margin-bottom:10px; }
+  .jump-row input{ width:60px; background:#241c10; color:var(--rail-text); border:1px solid rgba(240,227,200,.18); border-radius:8px; padding:7px; font-size:13px; }
+  .go-btn{ flex:1; background:var(--accent); color:#1a120b; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; }
+  .nav-mini{ display:flex; gap:6px; margin-bottom:10px; }
+  .nav-mini button{ flex:1; background:#241c10; color:var(--rail-text); border:1px solid rgba(240,227,200,.15); border-radius:8px; padding:7px 0; cursor:pointer; font-size:13px; }
+  .dots{ display:flex; flex-wrap:wrap; gap:5px; max-width:200px; }
+  .dot{ width:8px; height:8px; border-radius:50%; background:rgba(240,227,200,.25); cursor:pointer; }
+  .dot.active{ background:var(--accent); width:18px; border-radius:4px; }
+
+  .overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:40; }
+  .menu-toggle{
+    display:none; position:fixed; top:14px; left:14px; z-index:100;
+    width:44px; height:44px; border-radius:50%; background:var(--rail-bg); color:var(--accent);
+    border:1px solid rgba(240,227,200,.2); font-size:19px; align-items:center; justify-content:center;
+    box-shadow:0 4px 14px rgba(0,0,0,.4); cursor:pointer;
+  }
+
+  /* ============ STAGE / BOOK ============ */
+  .stage{ flex:1; position:relative; display:flex; align-items:center; justify-content:center; perspective:2600px; padding:36px; }
+  .binding{ position:absolute; left:26px; top:6%; bottom:6%; width:30px; display:flex; flex-direction:column; justify-content:space-evenly; align-items:center; z-index:5; }
+  .ring{ width:24px; height:24px; border-radius:50%; border:5px solid var(--binding); background: radial-gradient(circle at 35% 30%, #444, var(--binding-dark)); box-shadow:2px 2px 4px rgba(0,0,0,.6); }
+
+  .book{
+    position:relative;
+    width: min(920px, 92vw);
+    height: min(860px, 82vh);
+    transform-style:preserve-3d;
+  }
+
+  .page{
+    position:absolute; inset:0;
+    background: var(--paper);
+    background-image: radial-gradient(rgba(255,255,255,.02) 1px, transparent 1px);
+    background-size:3px 3px;
+    border-radius:4px 14px 14px 4px;
+    box-shadow: 0 22px 55px rgba(0,0,0,.6), inset 0 0 70px rgba(0,0,0,.35);
+    padding: 54px 50px 40px 76px;
+    display:flex; flex-direction:column;
+    backface-visibility:hidden;
+    transform-origin:left center;
+    overflow:hidden;
+  }
+  .page.flipping{ z-index:20; transition: transform .85s cubic-bezier(.45,.05,.55,.95); }
+  .page.stack{ z-index:10; }
+  .page-shade{ position:absolute; inset:0; pointer-events:none; opacity:0; }
+
+  .page-label{ font-family:'Baloo 2',sans-serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; color: var(--accent); opacity:.8; margin-bottom:16px; }
+  .page-title{ font-family:'Yatra One', cursive; font-size:clamp(24px,3.6vw,34px); color:var(--accent); margin:0 0 20px 0; line-height:1.35; }
+  .page-content{ font-family:var(--font-body); font-size:var(--font-size); line-height:var(--line-height); color:var(--ink); flex:1; overflow-y:auto; padding-right:8px; }
+  .page-content::-webkit-scrollbar{ width:5px; }
+  .page-content::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.15); border-radius:4px; }
+  .page-content p{ margin:0 0 16px 0; }
+  .page-number{ align-self:center; margin-top:12px; font-family:'Caveat',cursive; font-size:18px; color:var(--accent); opacity:.8; }
+
+  .corner{ position:absolute; right:10px; bottom:10px; width:32px; height:32px; cursor:pointer; opacity:.55; color:var(--accent); }
+  .corner.left{ right:auto; left:10px; }
+  .corner svg{ width:100%; height:100%; }
+  .tap-zone{ position:absolute; top:0; bottom:0; width:16%; z-index:30; cursor:pointer; }
+  .tap-zone.next{ right:0; } .tap-zone.prev{ left:0; }
+
+  .signature-mark{ position:absolute; bottom:24px; right:44px; font-family:'Caveat',cursive; font-size:19px; color:var(--accent); opacity:.6; transform:rotate(-4deg); pointer-events:none; }
+  .blank-hint{ color:var(--accent); opacity:.4; font-family:'Caveat',cursive; font-size:22px; text-align:center; margin-top:60px; }
+
+  /* Themes */
+  .theme-black{ --paper:#201f1f; --binding:#0c0c0c; --binding-dark:#000; --ink:#e9dfc7; --accent:#c9922a; }
+  .theme-cream{ --paper:#f6ecd4; --binding:#6b4423; --binding-dark:#4a2e17; --ink:#2b3a55; --accent:#a3691c; }
+  .theme-midnight{ --paper:#161b22; --binding:#1c2733; --binding-dark:#0e151d; --ink:#dbe6f0; --accent:#5fa8cf; }
+  .theme-sepia{ --paper:#efdcc0; --binding:#5c3a21; --binding-dark:#3a2413; --ink:#4a2f1c; --accent:#a35d2b; }
+  .theme-forest{ --paper:#10160f; --binding:#2f4a34; --binding-dark:#1c2f20; --ink:#d6e2cf; --accent:#6fae6f; }
+
+  @media (max-width:880px){
+    .rail{ position:fixed; top:0; left:0; bottom:0; transform:translateX(-105%); }
+    .rail.open{ transform:translateX(0); }
+    .overlay.show{ display:block; }
+    .menu-toggle{ display:flex; }
+    .flyout{ left:12px; right:12px; width:auto; top:70px; }
+    .binding{ display:none; }
+    .stage{ padding:14px; padding-top:70px; }
+    .page{ padding:58px 22px 26px 26px; }
+    .page-title{ font-size:22px; }
+    .tap-zone{ width:22%; }
+  }
+  @media (max-width:420px){ .book{ width:94vw; height:74vh; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="rail" id="rail">
+    <div class="rail-logo">K</div>
+    <div class="icon-btn" data-panel="theme" title="Theme">🎨</div>
+    <div class="icon-btn" data-panel="font" title="Font">✒️</div>
+    <div class="icon-btn" data-panel="color" title="Ink Color">🖊️</div>
+    <div class="icon-btn" data-panel="size" title="Font Size">🔠</div>
+    <div class="icon-btn" data-panel="jump" title="Jump to Page">📖</div>
+    <div class="rail-spacer"></div>
+    <div class="rail-foot">10 Pages<br>Black Book</div>
+  </aside>
+
+  <!-- Flyout panels -->
+  <div class="flyout" id="panel-theme">
+    <h4>Page Theme</h4>
+    <div class="swatches" id="themeSwatches">
+      <div class="swatch active" data-theme="theme-black" style="background:#201f1f" title="Black Book"></div>
+      <div class="swatch" data-theme="theme-cream" style="background:#f6ecd4" title="Cream"></div>
+      <div class="swatch" data-theme="theme-midnight" style="background:#161b22" title="Midnight"></div>
+      <div class="swatch" data-theme="theme-sepia" style="background:#efdcc0" title="Sepia"></div>
+      <div class="swatch" data-theme="theme-forest" style="background:#10160f" title="Forest"></div>
+    </div>
+  </div>
+
+  <div class="flyout" id="panel-font">
+    <h4>Font Style</h4>
+    <select id="fontSelect">
+      <option value="'Hind', sans-serif">Hind — Modern</option>
+      <option value="'Kalam', cursive">Kalam — Handwritten</option>
+      <option value="'Noto Serif Devanagari', serif">Noto Serif — Classic</option>
+      <option value="'Baloo 2', sans-serif">Baloo 2 — Playful</option>
+    </select>
+  </div>
+
+  <div class="flyout" id="panel-color">
+    <h4>Ink Color</h4>
+    <div class="colorwrap">
+      <input type="color" id="inkColor" value="#e9dfc7">
+      <div class="color-presets" id="inkPresets">
+        <div class="cdot active" style="background:#e9dfc7" data-color="#e9dfc7" title="Light Ink"></div>
+        <div class="cdot" style="background:#f2c14e" data-color="#f2c14e" title="Gold"></div>
+        <div class="cdot" style="background:#e07a5f" data-color="#e07a5f" title="Red"></div>
+        <div class="cdot" style="background:#81b29a" data-color="#81b29a" title="Green"></div>
+        <div class="cdot" style="background:#c9a7eb" data-color="#c9a7eb" title="Purple"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flyout" id="panel-size">
+    <h4>Font Size</h4>
+    <div class="size-control">
+      <button class="size-btn" id="sizeDown">−</button>
+      <span class="size-val" id="sizeVal">21px</span>
+      <button class="size-btn" id="sizeUp">+</button>
+    </div>
+  </div>
+
+  <div class="flyout" id="panel-jump">
+    <h4>Jump to Page</h4>
+    <div class="jump-row">
+      <input type="number" id="jumpInput" min="1" value="1">
+      <button class="go-btn" id="jumpGo">Go</button>
+    </div>
+    <div class="nav-mini">
+      <button id="prevBtn">‹ Prev</button>
+      <button id="nextBtn">Next ›</button>
+    </div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <main class="stage theme-black" id="stage">
+    <div class="binding" id="binding"></div>
+    <div class="book" id="book"></div>
+  </main>
+</div>
+
+<script>
+(function(){
+  const pages = [
+    { label:"Cover", title:"The Impact of Karma<br>in the Modern World",
+      html:`<p style="text-align:center; margin-top:30px;">A reflection on the relationship between actions, destiny, and life.</p>
+            <p style="text-align:center; font-family:'Caveat',cursive; font-size:1.4em; margin-top:50px;">— from my notebook —</p>` },
+
+    { label:"Page 1", title:"",
+      html:`<p>In ancient times, people believed that whatever actions (karma) we perform, we will receive their corresponding results. However, in today's world, consider a couple who leads a completely pure and simple life, yet one of them gets diagnosed with blood cancer. They would naturally feel: "We haven't done anything wrong, so why did this happen to us? Everything we've done has been right."</p>
+            <p>To understand this, we must comprehend two fundamental forces in life that run side by side: karma and destiny (luck). The problem here is often not just an issue of individual karma, but of destiny. It is possible that this illness occurred because they consumed pesticide-laden food, or due to rapid environmental changes.</p>` },
+
+    { label:"Page 2", title:"",
+      html:`<p>In ancient times, most parameters of life were fixed, and there weren't such drastic environmental changes. Back then, relying mostly on individual karma was sufficient to keep things in balance. Today, however, we have altered so many variables in the modern era that we have become much more dependent on destiny.</p>
+            <p>Beyond individual actions, we now also have to look at broader factors:</p>
+            <ul style="margin:0 0 16px 20px; padding:0;">
+              <li style="margin-bottom:10px;">What are the government's environmental and food policies?</li>
+              <li style="margin-bottom:10px;">What is the general standard of living?</li>
+              <li style="margin-bottom:10px;">What kind of food are we eating, and what kind of environment are we living in?</li>
+            </ul>` },
+
+    { label:"Page 3", title:"",
+      html:`<p>All of these combined form our collective karma, which eventually shapes our destiny. The actions performed by others or society at large are now directly impacting our personal lives.</p>
+            <p>In the modern world, destiny (shaped by collective factors) has become more significant. Individual karma still holds importance, but this collective karma has a far greater impact on our lives today.</p>` },
+
+    { label:"Page 4", title:"Write Your Thoughts",
+      html:`<div class="blank-hint">✎ This page is blank — write your own reflections here</div>` },
+
+    { label:"Final Page", title:"The End",
+      html:`<p style="text-align:center; margin-top:40px;">Thank you — for reading.</p>
+            <p style="text-align:center; font-family:'Caveat',cursive; font-size:1.3em;">✎ My Notebook</p>` }
+  ];
+
+  let current = 0;
+  let animating = false;
+
+  const book = document.getElementById('book');
+  const stage = document.getElementById('stage');
+  const binding = document.getElementById('binding');
+  const dotsWrap = document.getElementById('dots');
+  const jumpInput = document.getElementById('jumpInput');
+  jumpInput.max = pages.length;
+
+  function buildRings(){
+    binding.innerHTML='';
+    for(let i=0;i<9;i++){ const r=document.createElement('div'); r.className='ring'; binding.appendChild(r); }
+  }
+  buildRings();
+
+  function buildDots(){
+    dotsWrap.innerHTML='';
+    pages.forEach((p,i)=>{
+      const d=document.createElement('div');
+      d.className='dot'+(i===current?' active':'');
+      d.title=p.label;
+      d.addEventListener('click',()=>jumpTo(i));
+      dotsWrap.appendChild(d);
+    });
+  }
+
+  function cornerSVG(){
+    return `<svg viewBox="0 0 24 24" fill="none"><path d="M4 4L20 20M20 20H8M20 20V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  }
+
+  function pageMarkup(idx){
+    const p = pages[idx];
+    return `
+      <div class="page-shade"></div>
+      <div class="page-label">${p.label} — ${idx+1} / ${pages.length}</div>
+      ${p.title ? `<h1 class="page-title">${p.title}</h1>` : ''}
+      <div class="page-content">${p.html}</div>
+      <div class="signature-mark">✎</div>
+      <div class="page-number">${idx+1}</div>
+      <div class="tap-zone prev" data-dir="-1"></div>
+      <div class="tap-zone next" data-dir="1"></div>
+      ${idx>0 ? `<div class="corner left" data-dir="-1">${cornerSVG()}</div>` : ''}
+      ${idx<pages.length-1 ? `<div class="corner" data-dir="1">${cornerSVG()}</div>` : ''}
+    `;
+  }
+
+  function attachHandlers(pageEl){
+    pageEl.querySelectorAll('.tap-zone, .corner').forEach(el=>{
+      el.addEventListener('click', ()=> turn(parseInt(el.getAttribute('data-dir'))));
+    });
+  }
+
+  function render(){
+    book.innerHTML='';
+    const p=document.createElement('div');
+    p.className='page stack';
+    p.innerHTML=pageMarkup(current);
+    book.appendChild(p);
+    attachHandlers(p);
+    jumpInput.value=current+1;
+    buildDots();
+  }
+
+  function doFlip(targetIdx){
+    if(animating || targetIdx===current || targetIdx<0 || targetIdx>=pages.length) return;
+    animating = true;
+    const dir = targetIdx > current ? 1 : -1;
+
+    const base=document.createElement('div');
+    base.className='page stack';
+    base.innerHTML=pageMarkup(targetIdx);
+    attachHandlers(base);
+
+    const flip=document.createElement('div');
+    flip.className='page flipping';
+    flip.innerHTML=pageMarkup(current);
+    flip.style.transformOrigin = dir>0 ? 'left center' : 'right center';
+    flip.style.transform='rotateY(0deg)';
+
+    book.innerHTML='';
+    book.appendChild(base);
+    book.appendChild(flip);
+
+    const shade = flip.querySelector('.page-shade');
+    requestAnimationFrame(()=>{
+      flip.style.transform = dir>0 ? 'rotateY(-160deg)' : 'rotateY(160deg)';
+      shade.style.background='linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,0) 60%)';
+      shade.style.opacity='1';
+      shade.style.transition='opacity .85s ease';
+    });
+
+    setTimeout(()=>{
+      current = targetIdx;
+      animating = false;
+      render();
+    }, 860);
+  }
+
+  function turn(dir){ doFlip(current+dir); }
+  function jumpTo(idx){ doFlip(idx); }
+
+  render();
+
+  document.getElementById('prevBtn').addEventListener('click', ()=>turn(-1));
+  document.getElementById('nextBtn').addEventListener('click', ()=>turn(1));
+  document.getElementById('jumpGo').addEventListener('click', ()=>{
+    let v=parseInt(jumpInput.value)-1;
+    if(isNaN(v)) return;
+    v=Math.max(0,Math.min(pages.length-1,v));
+    jumpTo(v);
+  });
+  jumpInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter') document.getElementById('jumpGo').click(); });
+  document.addEventListener('keydown',(e)=>{
+    if(e.key==='ArrowRight') turn(1);
+    if(e.key==='ArrowLeft') turn(-1);
+  });
+
+  let touchStartX=null;
+  stage.addEventListener('touchstart',(e)=>{ touchStartX=e.touches[0].clientX; });
+  stage.addEventListener('touchend',(e)=>{
+    if(touchStartX===null) return;
+    const dx=e.changedTouches[0].clientX-touchStartX;
+    if(Math.abs(dx)>50){ dx<0 ? turn(1) : turn(-1); }
+    touchStartX=null;
+  });
+
+  // ===== ICON RAIL / FLYOUT LOGIC =====
+  const iconBtns = document.querySelectorAll('.icon-btn[data-panel]');
+  const flyouts = document.querySelectorAll('.flyout');
+  function closeAllPanels(){
+    flyouts.forEach(f=>f.classList.remove('show'));
+    iconBtns.forEach(b=>b.classList.remove('active'));
+  }
+  iconBtns.forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const name = btn.getAttribute('data-panel');
+      const panel = document.getElementById('panel-'+name);
+      const wasOpen = panel.classList.contains('show');
+      closeAllPanels();
+      if(!wasOpen){
+        panel.classList.add('show');
+        btn.classList.add('active');
+        const rect = btn.getBoundingClientRect();
+        if(window.innerWidth > 880){
+          panel.style.top = Math.max(16, rect.top - 10) + 'px';
+        }
+      }
+    });
+  });
+  document.addEventListener('click', (e)=>{
+    if(!e.target.closest('.flyout')) closeAllPanels();
+  });
+
+  // ===== THEME =====
+  document.querySelectorAll('.swatch').forEach(sw=>{
+    sw.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+      sw.classList.add('active');
+      stage.className = 'stage ' + sw.getAttribute('data-theme');
+    });
+  });
+
+  // ===== FONT =====
+  document.getElementById('fontSelect').addEventListener('change', (e)=>{
+    document.documentElement.style.setProperty('--font-body', e.target.value);
+  });
+
+  // ===== INK COLOR =====
+  const inkColorInput = document.getElementById('inkColor');
+  inkColorInput.addEventListener('input', (e)=>{
+    document.documentElement.style.setProperty('--ink', e.target.value);
+  });
+  document.querySelectorAll('.cdot').forEach(dot=>{
+    dot.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      document.querySelectorAll('.cdot').forEach(c=>c.classList.remove('active'));
+      dot.classList.add('active');
+      const c = dot.getAttribute('data-color');
+      inkColorInput.value = c;
+      document.documentElement.style.setProperty('--ink', c);
+    });
+  });
+
+  // ===== FONT SIZE =====
+  let fontSize = 21;
+  const sizeVal = document.getElementById('sizeVal');
+  function applySize(){
+    document.documentElement.style.setProperty('--font-size', fontSize+'px');
+    sizeVal.textContent = fontSize+'px';
+  }
+  document.getElementById('sizeUp').addEventListener('click', ()=>{ if(fontSize<34){fontSize+=2; applySize();} });
+  document.getElementById('sizeDown').addEventListener('click', ()=>{ if(fontSize>13){fontSize-=2; applySize();} });
+
+  // ===== MOBILE RAIL TOGGLE =====
+  const rail = document.getElementById('rail');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click', ()=>{
+    rail.classList.toggle('open');
+    overlay.classList.toggle('show');
+  });
+  overlay.addEventListener('click', ()=>{
+    rail.classList.remove('open');
+    overlay.classList.remove('show');
+    closeAllPanels();
+  });
+
+})();
+</script>
+</body>
+</html>
